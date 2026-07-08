@@ -2,6 +2,7 @@
 requests>=2.31
 beautifulsoup4>=4.12
 openpyxl>=3.1
+flask>=3.0        # giao diện web (run_web.py)
 
 # Khuyến nghị (thiếu vẫn chạy được nhờ fallback, nhưng chất lượng thấp hơn)
 trafilatura>=1.8   # trích nội dung chính chuẩn hơn; thiếu -> fallback BeautifulSoup

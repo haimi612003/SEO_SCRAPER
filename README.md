@@ -83,6 +83,31 @@ Engine đã dùng theo từng keyword:
 
 Nếu cần ranking Google chính xác 100% và ổn định, dùng `serpapi` thay vì `google`.
 
+## Giao diện web
+
+Ngoài CLI, có 1 giao diện web local (Flask) chạy cùng logic scraping, log real-time,
+bảng kết quả, lịch sử, và quản lý API key qua UI thay vì sửa `.env` tay:
+
+```bash
+python run_web.py
+# mở http://127.0.0.1:5000
+```
+
+Chạy 1 job (chọn engine, nhập/tải keywords, xem log stream trực tiếp) rồi tải file Excel
+ngay trên trình duyệt. Lịch sử các lần chạy được lưu ở `data/` (gitignored) và sống sót qua
+restart server. Web app dùng chung `.env` với CLI — thêm/sửa API key qua UI cũng ghi vào
+cùng file `.env`.
+
+Frontend là React + TypeScript (Vite), build sẵn ra `webapp/static/` — `python run_web.py`
+chạy thẳng được luôn, không cần Node. Chỉ cần Node khi sửa giao diện:
+
+```bash
+cd webapp/frontend
+npm install
+npm run dev       # dev server có hot-reload, tự proxy /api sang Flask (:5000) — nhớ chạy `python run_web.py` song song
+npm run build      # type-check (tsc) rồi build production, output thẳng vào ../static (Flask serve)
+```
+
 ## Output
 
 File Excel, mỗi keyword 1 sheet:
@@ -100,8 +125,14 @@ Ghi chú: trang crawl lỗi sẽ ghi `[ERROR: ...]` vào cột content (vẫn gi
 ## Cấu trúc code
 
 ```
-seo_scraper.py    # CLI chính
+scraper_core.py   # Logic scraping dùng chung (search + fallback + crawl), CLI và web đều gọi
+seo_scraper.py    # CLI — adapter mỏng gọi scraper_core, in log ra terminal
+run_web.py        # Entrypoint chạy giao diện web (Flask)
+webapp/           # Flask app: routes API (jobs/events/results/settings)
+webapp/frontend/  # Source React (Vite) — `npm run build` output ra webapp/static/
+webapp/static/    # Frontend đã build (commit sẵn) — Flask serve trực tiếp, không cần Node lúc chạy
 engines/          # 4 search engine, interface chung — dễ thêm engine mới
 extractor.py      # Crawl URL → title + full content (trafilatura + fallback BeautifulSoup)
 exporter.py       # Xuất Excel
+data/             # (gitignored) job/lịch sử của web app — history.json + jobs/<id>/
 ```

@@ -5,3 +5,6 @@ __pycache__/
 result*.xlsx
 .DS_Store
 .claude/
+data/
+webapp/frontend/node_modules/
+webapp/frontend/dist/
